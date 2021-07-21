@@ -9,6 +9,8 @@ import static org.junit.Assert.fail;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -85,6 +87,13 @@ public class DatabaseFieldConfigTest extends BaseCoreTest {
 	@Test
 	public void testFromDbField() throws Exception {
 		Field[] fields = Foo.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 1);
 		DatabaseFieldConfig config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]);
 		assertNotNull(config);
@@ -99,18 +108,30 @@ public class DatabaseFieldConfigTest extends BaseCoreTest {
 	public void testJavaxAnnotations() throws Exception {
 		Field[] fields = JavaxAnno.class.getDeclaredFields();
 		assertTrue(fields.length >= 7);
-
+		
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
+		
+		for(int i = 0; i< fields.length; i++){
+			System.out.print(fields[i].toString() + " id : ");
+			System.out.println(i);
+		}
 		// not a column
-		assertNull(DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]));
+		assertNull(DatabaseFieldConfig.fromField(databaseType, "foo", fields[4]));
 
-		DatabaseFieldConfig config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[1]);
+		DatabaseFieldConfig config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[2]);
 		assertNotNull(config);
 		assertFalse(config.isId());
 		assertTrue(config.isGeneratedId());
 		assertFalse(config.isUseGetSet());
-		assertEquals(fields[1].getName(), config.getFieldName());
+		assertEquals(fields[2].getName(), config.getFieldName());
 
-		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[2]);
+		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[6]);
 		assertNotNull(config);
 		assertFalse(config.isUseGetSet());
 		assertEquals(STUFF_FIELD_NAME, config.getColumnName());
@@ -121,30 +142,36 @@ public class DatabaseFieldConfigTest extends BaseCoreTest {
 		assertFalse(config.isUseGetSet());
 		assertEquals(fields[3].getName(), config.getFieldName());
 
-		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[4]);
+		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[5]);
 		assertNotNull(config);
 		assertFalse(config.isCanBeNull());
 		assertFalse(config.isUseGetSet());
-		assertEquals(fields[4].getName(), config.getFieldName());
-
-		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[5]);
-		assertNotNull(config);
-		assertTrue(config.isForeign());
-		assertNull(config.getDataPersister());
 		assertEquals(fields[5].getName(), config.getFieldName());
 
-		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[6]);
+		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]);
 		assertNotNull(config);
 		assertTrue(config.isForeign());
 		assertNull(config.getDataPersister());
-		assertEquals(fields[6].getName(), config.getFieldName());
+		assertEquals(fields[0].getName(), config.getFieldName());
+
+		config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[1]);
+		assertNotNull(config);
+		assertTrue(config.isForeign());
+		assertNull(config.getDataPersister());
+		assertEquals(fields[1].getName(), config.getFieldName());
 	}
 
 	@Test
 	public void testJavaxJustId() throws Exception {
 		Field[] fields = JavaxAnnoJustId.class.getDeclaredFields();
 		assertTrue(fields.length >= 1);
-
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		DatabaseFieldConfig config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]);
 		assertNotNull(config);
 		assertTrue(config.isId());
@@ -157,7 +184,13 @@ public class DatabaseFieldConfigTest extends BaseCoreTest {
 	public void testJavaxGetSet() throws Exception {
 		Field[] fields = JavaxGetSet.class.getDeclaredFields();
 		assertTrue(fields.length >= 1);
-
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		DatabaseFieldConfig config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]);
 		assertNotNull(config);
 		assertTrue(config.isUseGetSet());
@@ -167,6 +200,13 @@ public class DatabaseFieldConfigTest extends BaseCoreTest {
 	@Test
 	public void testJavaxUnique() throws Exception {
 		Field[] fields = JavaxUnique.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 1);
 
 		DatabaseFieldConfig config = DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]);
@@ -178,6 +218,13 @@ public class DatabaseFieldConfigTest extends BaseCoreTest {
 	@Test(expected = IllegalArgumentException.class)
 	public void testUnknownEnumVal() throws Exception {
 		Field[] fields = BadUnknownVal.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 1);
 		DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]);
 	}
@@ -194,8 +241,15 @@ public class DatabaseFieldConfigTest extends BaseCoreTest {
 	@Test
 	public void testComboIndex() throws Exception {
 		Field[] fields = ComboIndex.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 2);
-		DatabaseFieldConfig fieldConfig = DatabaseFieldConfig.fromField(databaseType, "foo", fields[0]);
+		DatabaseFieldConfig fieldConfig = DatabaseFieldConfig.fromField(databaseType, "foo", fields[2]);
 		String tableName = "foo";
 		assertEquals(ComboIndex.INDEX_NAME, fieldConfig.getIndexName(tableName));
 		fieldConfig = DatabaseFieldConfig.fromField(databaseType, tableName, fields[1]);
