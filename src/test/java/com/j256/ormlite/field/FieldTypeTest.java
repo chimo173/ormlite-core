@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
+import java.util.Arrays;
+import java.util.Comparator;
 import org.junit.Test;
 
 import com.j256.ormlite.BaseCoreTest;
@@ -47,11 +48,18 @@ public class FieldTypeTest extends BaseCoreTest {
 	public void testFieldType() throws Exception {
 
 		Field[] fields = LocalFoo.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 4);
-		Field nameField = fields[0];
-		Field rankField = fields[1];
-		Field serialField = fields[2];
-		Field intLongField = fields[3];
+		Field nameField = fields[1];
+		Field rankField = fields[2];
+		Field serialField = fields[3];
+		Field intLongField = fields[0];
 
 		FieldType fieldType =
 				FieldType.createFieldType(databaseType, LocalFoo.class.getSimpleName(), nameField, LocalFoo.class);
@@ -146,9 +154,16 @@ public class FieldTypeTest extends BaseCoreTest {
 
 	@Test
 	public void testFieldTypeConverter() throws Exception {
-		Field[] fields = LocalFoo.class.getDeclaredFields();
+		Field[] fields = LocalFoo.class.getDeclaredFields();		
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 4);
-		Field nameField = fields[0];
+		Field nameField = fields[1];
 		DatabaseType databaseType = createMock(DatabaseType.class);
 		final SqlType sqlType = SqlType.DATE;
 		final String nameArg = "zippy buzz";
@@ -216,11 +231,18 @@ public class FieldTypeTest extends BaseCoreTest {
 	public void testFieldForeign() throws Exception {
 
 		Field[] fields = ForeignParent.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 3);
 		@SuppressWarnings("unused")
-		Field idField = fields[0];
-		Field nameField = fields[1];
-		Field bazField = fields[2];
+		Field idField = fields[1];
+		Field nameField = fields[2];
+		Field bazField = fields[0];
 
 		FieldType fieldType = FieldType.createFieldType(databaseType, ForeignParent.class.getSimpleName(), nameField,
 				ForeignParent.class);
@@ -390,8 +412,15 @@ public class FieldTypeTest extends BaseCoreTest {
 	@Test
 	public void testSetValueField() throws Exception {
 		Field[] fields = LocalFoo.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 4);
-		Field nameField = fields[0];
+		Field nameField = fields[1];
 		FieldType fieldType =
 				FieldType.createFieldType(databaseType, LocalFoo.class.getSimpleName(), nameField, LocalFoo.class);
 		LocalFoo foo = new LocalFoo();
@@ -416,8 +445,15 @@ public class FieldTypeTest extends BaseCoreTest {
 	@Test(expected = SQLException.class)
 	public void testSetIdFieldString() throws Exception {
 		Field[] fields = LocalFoo.class.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 4);
-		Field nameField = fields[0];
+		Field nameField = fields[1];
 		FieldType fieldType =
 				FieldType.createFieldType(databaseType, LocalFoo.class.getSimpleName(), nameField, LocalFoo.class);
 		fieldType.assignIdValue(connectionSource, new LocalFoo(), 10, null);
@@ -426,6 +462,14 @@ public class FieldTypeTest extends BaseCoreTest {
 	@Test
 	public void testCanBeNull() throws Exception {
 		Field[] fields = CanBeNull.class.getDeclaredFields();
+
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 2);
 		Field field = fields[0];
 		FieldType fieldType =
@@ -439,8 +483,16 @@ public class FieldTypeTest extends BaseCoreTest {
 	@Test
 	public void testAssignForeign() throws Exception {
 		Field[] fields = ForeignParent.class.getDeclaredFields();
-		assertTrue(fields.length >= 3);
-		Field field = fields[2];
+		
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
+		Field field = fields[0];
+
 		FieldType fieldType = FieldType.createFieldType(databaseType, ForeignParent.class.getSimpleName(), field,
 				ForeignParent.class);
 		fieldType.configDaoInformation(connectionSource, ForeignParent.class);
@@ -470,6 +522,13 @@ public class FieldTypeTest extends BaseCoreTest {
 	public void testGeneratedIdDefaultValue() throws Exception {
 		Class<GeneratedIdDefault> clazz = GeneratedIdDefault.class;
 		Field[] fields = clazz.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 1);
 		Field idField = fields[0];
 		FieldType.createFieldType(databaseType, clazz.getSimpleName(), idField, clazz);
@@ -479,6 +538,13 @@ public class FieldTypeTest extends BaseCoreTest {
 	public void testThrowIfNullNotPrimitive() throws Exception {
 		Class<ThrowIfNullNonPrimitive> clazz = ThrowIfNullNonPrimitive.class;
 		Field[] fields = clazz.getDeclaredFields();
+		Arrays.sort(fields, new Comparator<Field>() {
+			public int compare(Field a, Field b) {
+				if (a.isSynthetic()) return 1;
+				if (b.isSynthetic()) return -1;
+				return a.getName().compareTo(b.getName());
+			}
+		});
 		assertTrue(fields.length >= 1);
 		Field field = fields[0];
 		FieldType.createFieldType(databaseType, clazz.getSimpleName(), field, clazz);
